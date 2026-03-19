@@ -6,7 +6,7 @@ class RidePrefRepoMock implements RidePrefRepo{
   int get maxAllowedSeat => 8;
 
   @override
-  List<RidePreference> get preferenceHistory => [];
+  List<RidePreference> preferenceHistory = [];
 
   @override
   void addPreferenceToHistory(RidePreference ridePref) {
