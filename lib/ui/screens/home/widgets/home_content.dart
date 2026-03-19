@@ -1,11 +1,12 @@
 import 'package:blabla/model/ride_pref/ride_pref.dart';
 import 'package:blabla/ui/screens/home/view_model/home_view_model.dart';
 import 'package:blabla/ui/screens/home/widgets/home_history_tile.dart';
+import 'package:blabla/ui/screens/rides_selection/rides_selection_screen.dart';
 import 'package:blabla/ui/theme/theme.dart';
 import 'package:blabla/ui/widgets/pickers/bla_ride_preference_picker.dart';
+import 'package:blabla/utils/animations_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 
 class HomeContent extends StatelessWidget {
   static const String blablaHomeImagePath = 'assets/images/blabla_home.png';
@@ -14,10 +15,20 @@ class HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     HomeViewModel vm = context.watch<HomeViewModel>();
-    return Stack(children: [_buildBackground(), _buildForeground(vm)]);
+
+    void onRidePrefSelected(RidePreference pref) {
+      vm.onRidePrefSelected(pref);
+      Navigator.of(context).push(
+        AnimationUtils.createBottomToTopRoute(RidesSelectionScreen()),
+      );
+    }
+
+    return Stack(
+      children: [_buildBackground(), _buildForeground(vm, onRidePrefSelected)],
+    );
   }
 
-  Widget _buildForeground(HomeViewModel vm) {
+  Widget _buildForeground(HomeViewModel vm, void Function(RidePreference pref) onRidePrefSelected) {
     return Column(
       children: [
         // 1 - THE HEADER
@@ -44,12 +55,12 @@ class HomeContent extends StatelessWidget {
               // 2 - THE FORM
               BlaRidePreferencePicker(
                 initRidePreference: vm.currPref,
-                onRidePreferenceSelected: vm.onRidePrefSelected,
+                onRidePreferenceSelected: onRidePrefSelected,
               ),
               SizedBox(height: BlaSpacings.m),
 
               // 3 - THE HISTORY
-              _buildHistory(vm),
+              _buildHistory(vm, onRidePrefSelected),
             ],
           ),
         ),
@@ -57,7 +68,7 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildHistory(HomeViewModel vm) {
+  Widget _buildHistory(HomeViewModel vm, void Function(RidePreference pref) onRidePrefSelected) {
     // Reverse the history of preferences
     List<RidePreference> history = vm.history.reversed.toList();
     return SizedBox(
@@ -68,7 +79,7 @@ class HomeContent extends StatelessWidget {
         itemCount: history.length,
         itemBuilder: (ctx, index) => HomeHistoryTile(
           ridePref: history[index],
-          onPressed: () => vm.onRidePrefSelected(history[index]),
+          onPressed: () => onRidePrefSelected(history[index]),
         ),
       ),
     );
