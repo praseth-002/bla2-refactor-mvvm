@@ -25,7 +25,6 @@ class RidesSelectionViewModel extends ChangeNotifier {
 
   RidePreference? get currPref => ridePrefState.currPref;
 
-  // List<Ride> get matchingRides => rideRepo.getRidesFor(currPref!);
   List<Ride> get matchingRides => currPref == null 
     ? [] 
     : rideRepo.getRidesFor(currPref!);
